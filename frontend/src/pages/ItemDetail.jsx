@@ -62,14 +62,6 @@ function ItemDetail() {
     <div className="max-w-xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
       {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
 
-      {item.image && (
-        <img
-          src={item.image}
-          alt={item.title}
-          className="w-full h-48 object-cover rounded-lg mb-4"
-        />
-      )}
-
       <span
         className={`text-xs font-semibold px-2 py-1 rounded ${
           item.type === 'lost' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'
