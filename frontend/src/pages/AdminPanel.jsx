@@ -8,6 +8,7 @@ function AdminPanel() {
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [items, setItems] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -22,13 +23,15 @@ function AdminPanel() {
         const token = localStorage.getItem('token');
         const headers = { Authorization: `Bearer ${token}` };
 
-        const [statsRes, itemsRes] = await Promise.all([
+        const [statsRes, itemsRes, usersRes] = await Promise.all([
           API.get('/admin/stats', { headers }),
           API.get('/items', { headers }),
+          API.get('/admin/users', { headers }),
         ]);
 
         setStats(statsRes.data);
         setItems(itemsRes.data);
+        setUsers(usersRes.data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -90,7 +93,7 @@ function AdminPanel() {
 
       {/* Items Table */}
       <h2 className="text-xl font-bold mb-4">All Items</h2>
-      <div className="bg-white rounded-lg shadow overflow-x-auto">
+      <div className="bg-white rounded-lg shadow overflow-x-auto mb-8">
         <table className="w-full text-sm">
           <thead className="bg-gray-100">
             <tr>
@@ -116,6 +119,29 @@ function AdminPanel() {
                     Delete
                   </button>
                 </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Users Table */}
+      <h2 className="text-xl font-bold mb-4">All Users</h2>
+      <div className="bg-white rounded-lg shadow overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="p-3 text-left">Name</th>
+              <th className="p-3 text-left">Email</th>
+              <th className="p-3 text-left">Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((u) => (
+              <tr key={u._id} className="border-t">
+                <td className="p-3">{u.name}</td>
+                <td className="p-3">{u.email}</td>
+                <td className="p-3">{u.role}</td>
               </tr>
             ))}
           </tbody>
