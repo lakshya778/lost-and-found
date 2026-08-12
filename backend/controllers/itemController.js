@@ -1,4 +1,6 @@
 const Item = require('../models/Item');
+const Notification = require('../models/Notification');
+const User = require('../models/User');
 
 // Create item (lost ya found post karna)
 exports.createItem = async (req, res) => {
@@ -18,8 +20,9 @@ exports.createItem = async (req, res) => {
 
     res.status(201).json(item);
   } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+  console.error('CREATE ITEM ERROR:', error.message);
+  res.status(500).json({ message: error.message });
+}
 };
 
 // Sab items get karo (with filters)
@@ -60,7 +63,42 @@ exports.updateItemStatus = async (req, res) => {
     const item = await Item.findById(req.params.id);
     if (!item) return res.status(404).json({ message: 'Item not found' });
 
-    item.status = req.body.status;
+    const newStatus = req.body.status;
+
+    // Jab item claim ho
+    if (newStatus === 'claimed' && item.status !== 'claimed') {
+      item.claimedBy = req.user.id;
+
+      const claimer = await User.findById(req.user.id);
+
+      await Notification.create({
+        user: item.postedBy,
+        message: `${claimer.name} claimed your item "${item.title}"`,
+        item: item._id,
+        type: 'claim',
+      });
+    }
+
+    // Jab item resolve ho
+    if (newStatus === 'resolved' && item.status !== 'resolved') {
+      await Notification.create({
+        user: item.postedBy,
+        message: `Your item "${item.title}" has been marked as resolved`,
+        item: item._id,
+        type: 'resolve',
+      });
+
+      if (item.claimedBy) {
+        await Notification.create({
+          user: item.claimedBy,
+          message: `The item "${item.title}" you claimed has been resolved`,
+          item: item._id,
+          type: 'resolve',
+        });
+      }
+    }
+
+    item.status = newStatus;
     await item.save();
 
     res.status(200).json(item);

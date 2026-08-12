@@ -15,7 +15,10 @@ const itemRoutes = require('./routes/itemRoutes');
 app.use('/api/items', itemRoutes);
 
 const adminRoutes = require('./routes/adminRoutes');
-app.use('/api/admin', adminRoutes);   // Ye line 'app' define hone ke BAAD honi chahiye
+app.use('/api/admin', adminRoutes);  
+
+const notificationRoutes = require('./routes/notificationRoutes');
+app.use('/api/notifications', notificationRoutes);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))

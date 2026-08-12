@@ -40,6 +40,10 @@ const itemSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  claimedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Item', itemSchema);
